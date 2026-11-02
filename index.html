@@ -1,0 +1,296 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Smart University Student System - Prototype</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+/* Layout: one phone-sized prototype centered on the page, 5 clickable screens, flow hint underneath. */
+:root{
+  --bg:#e9eef6; --phone:#ffffff; --ink:#0f1f3d; --muted:#5a6a86; --line:#d6deec;
+  --brand:#1d4ed8; --brand-ink:#ffffff; --tile:#eef3fc; --map:#f1f5f0; --bld:#dbe7fb; --good:#15803d;
+  --font:'Manrope',system-ui,-apple-system,'Segoe UI',sans-serif;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --bg:#0b1220; --phone:#121c31; --ink:#eaf0fb; --muted:#9fb0cf; --line:#26344f;
+  --brand:#5b8cff; --brand-ink:#0b1220; --tile:#1a2842; --map:#16233a; --bld:#274272; --good:#4ade80; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#0b1220; --phone:#121c31; --ink:#eaf0fb; --muted:#9fb0cf; --line:#26344f;
+  --brand:#5b8cff; --brand-ink:#0b1220; --tile:#1a2842; --map:#16233a; --bld:#274272; --good:#4ade80; color-scheme:dark}
+html,body{margin:0;min-height:100%}
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--ink);font-family:var(--font);padding-inline:16px;padding-block:24px;display:flex;flex-direction:column;align-items:center;gap:16px}
+.phone{width:100%;max-width:390px;height:760px;max-height:calc(100vh - 90px);min-height:640px;background:var(--phone);border:1px solid var(--line);border-radius:34px;box-shadow:0 20px 50px rgba(15,31,61,.18);position:relative;overflow:hidden}
+.screen{position:absolute;inset:0;padding:28px 22px 22px;display:none;flex-direction:column;gap:16px}
+.screen.on{display:flex}
+.top{display:flex;align-items:center;gap:10px;min-height:36px}
+h1{font-size:22px;margin:0;font-weight:800;letter-spacing:-.01em}
+.brand{font-size:12px;font-weight:700;letter-spacing:.14em;color:var(--brand)}
+.sub{color:var(--muted);font-size:15px;margin:0}
+button{font:inherit;color:inherit;cursor:pointer}
+button:focus-visible,input:focus-visible{outline:3px solid var(--brand);outline-offset:2px}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:6px}
+.tile{background:var(--tile);border:1.5px solid transparent;border-radius:16px;padding:18px 14px;text-align:left;display:flex;flex-direction:column;gap:12px;font-weight:700;font-size:15px;min-height:104px}
+.tile svg{width:28px;height:28px;stroke:var(--brand);fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+.tile.main{background:var(--brand);color:var(--brand-ink)}
+.tile.main svg{stroke:var(--brand-ink)}
+.tile:hover{border-color:var(--brand)}
+.btn{background:var(--brand);color:var(--brand-ink);border:0;border-radius:14px;padding:15px;font-weight:700;font-size:16px;width:100%}
+.btn.ghost{background:transparent;color:var(--brand);border:1.5px solid var(--brand)}
+.back{background:var(--tile);border:0;border-radius:12px;width:38px;height:38px;display:grid;place-items:center;flex:none}
+.back svg{width:18px;height:18px;stroke:var(--ink);fill:none;stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round}
+.search{display:flex;align-items:center;gap:10px;background:var(--tile);border:1.5px solid var(--line);border-radius:14px;padding:0 14px;height:48px;width:100%;text-align:left;color:var(--muted);font-size:15px}
+.search svg{width:18px;height:18px;stroke:var(--muted);fill:none;stroke-width:2;flex:none}
+input.search{color:var(--ink);outline-offset:2px}
+.map{flex:1;min-height:260px;background:var(--map);border:1px solid var(--line);border-radius:18px;position:relative;overflow:hidden}
+.road{position:absolute;background:var(--line)}
+.bld{position:absolute;background:var(--bld);border:1.5px solid var(--brand);border-radius:10px;display:grid;place-items:center;font-weight:700;font-size:13px;padding:0 6px;text-align:center}
+.me{position:absolute;width:16px;height:16px;border-radius:50%;background:var(--brand);border:3px solid var(--phone);box-shadow:0 0 0 6px color-mix(in srgb,var(--brand) 25%,transparent)}
+.melabel{position:absolute;font-size:11px;font-weight:700;color:var(--brand)}
+.list{display:flex;flex-direction:column;gap:10px}
+.item{background:var(--tile);border:1.5px solid transparent;border-radius:14px;padding:14px;text-align:left;display:flex;flex-direction:column;gap:2px;font-weight:700;font-size:16px}
+.item small{font-weight:500;color:var(--muted);font-size:13px}
+.item:hover{border-color:var(--brand)}
+.msg{background:var(--tile);border-radius:14px;padding:16px;color:var(--muted);font-size:14px;line-height:1.45}
+.facts{display:flex;gap:12px}
+.fact{flex:1;background:var(--tile);border-radius:16px;padding:16px}
+.fact b{display:block;font-size:26px;font-weight:800;font-variant-numeric:tabular-nums}
+.fact span{font-size:12px;color:var(--muted);font-weight:600}
+.pin{display:flex;align-items:center;gap:10px;font-weight:700;font-size:17px}
+.pin svg{width:22px;height:22px;stroke:var(--brand);fill:none;stroke-width:2}
+.next{display:flex;align-items:center;gap:12px;background:var(--tile);border:1.5px solid var(--line);border-radius:16px;padding:14px 14px 14px 16px;text-align:left;width:100%}
+.next .t{flex:1;display:flex;flex-direction:column;gap:2px;font-weight:700;font-size:16px}
+.next small{font-weight:600;color:var(--muted);font-size:12px;letter-spacing:.06em;text-transform:uppercase}
+.next .go{background:var(--brand);color:var(--brand-ink);border-radius:10px;padding:9px 12px;font-weight:700;font-size:13px;flex:none}
+.spacer{flex:1}
+.route{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:0;background:var(--map);border:1px solid var(--line);border-radius:18px}
+.node{font-weight:800;font-size:15px;padding:10px 18px;border-radius:999px;background:var(--phone);border:2px solid var(--brand)}
+.node.end{background:var(--brand);color:var(--brand-ink)}
+.leg{width:0;height:76px;border-left:3px dashed var(--brand);position:relative;margin:4px 0}
+.leg span{position:absolute;left:14px;top:50%;transform:translateY(-50%);font-size:13px;font-weight:700;color:var(--muted);white-space:nowrap}
+.toast{position:absolute;left:22px;right:22px;bottom:22px;background:var(--ink);color:var(--phone);padding:12px 14px;border-radius:12px;font-size:13px;font-weight:600;opacity:0;transform:translateY(8px);transition:.2s;pointer-events:none}
+.toast.on{opacity:1;transform:none}
+.flow{display:flex;flex-wrap:wrap;gap:6px;justify-content:center;font-size:12px;font-weight:600;color:var(--muted);max-width:390px}
+.flow span{padding:4px 9px;border-radius:999px;border:1px solid var(--line)}
+.flow span.on{background:var(--brand);color:var(--brand-ink);border-color:var(--brand)}
+
+.smart{display:flex;align-items:center;gap:12px;background:var(--tile);border:1.5px solid var(--brand);border-radius:16px;padding:14px 14px 14px 16px;text-align:left;width:100%}
+.smart .t{flex:1;display:flex;flex-direction:column;gap:2px;font-weight:700;font-size:16px}
+.smart small{font-weight:600;color:var(--good);font-size:12px;letter-spacing:.06em;text-transform:uppercase}
+.smart .go{background:var(--brand);color:var(--brand-ink);border-radius:10px;padding:9px 12px;font-weight:700;font-size:13px;flex:none}
+.scroll{overflow:auto;display:flex;flex-direction:column;gap:10px;flex:1;min-height:0;padding-right:2px}
+.room{background:var(--tile);border:1.5px solid transparent;border-radius:14px;padding:12px 14px;text-align:left;display:flex;align-items:center;gap:12px;font-weight:700;font-size:16px;width:100%}
+.room .t{flex:1;display:flex;flex-direction:column;gap:2px}
+.room small{font-weight:500;color:var(--muted);font-size:13px}
+.room:hover{border-color:var(--brand)}
+.badge{font-size:12px;font-weight:800;border-radius:999px;padding:5px 10px;flex:none;border:1.5px solid}
+.badge.free{color:var(--good);border-color:var(--good)}
+.badge.part{color:#b45309;border-color:#b45309}
+.badge.busy{color:#b91c1c;border-color:#b91c1c}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]) .badge.part{color:#fbbf24;border-color:#fbbf24}:root:not([data-theme="light"]) .badge.busy{color:#f87171;border-color:#f87171}}
+.note{font-size:12px;color:var(--muted);font-weight:600;line-height:1.4}
+.link{background:none;border:0;color:var(--brand);font-weight:700;font-size:13px;text-decoration:underline;padding:4px;align-self:center}
+.fn{display:flex;align-items:flex-start;gap:10px;background:var(--tile);border-radius:12px;padding:10px 12px;font-size:13px;font-weight:600;line-height:1.35}
+.fn .st{flex:none;font-size:11px;font-weight:800;border-radius:999px;padding:3px 8px;border:1.5px solid;margin-top:1px}
+.st.done{color:var(--good);border-color:var(--good)}.st.part{color:#b45309;border-color:#b45309}.st.plan{color:var(--muted);border-color:var(--muted)}
+@media (prefers-reduced-motion:reduce){.toast{transition:none}}
+</style>
+
+</head><body>
+<main class="phone" id="phone">
+
+  <section class="screen on" id="s-home" aria-label="Home">
+    <div><div class="brand">SMART UNIVERSITY</div><h1 style="margin-top:6px">Welcome, Student!</h1><p class="sub">What do you need today?</p></div>
+    <button class="next" data-pick="B" aria-label="Next class, show route to Building B"><span class="t"><small>Next class · 11:00</small>Programming · Building B</span><span class="go">Show route</span></button>
+    <button class="smart" data-go="rooms" aria-label="Free rooms now, from simulated sensor data"><span class="t"><small>Smart · sensors (simulated)</small>Free rooms now<span id="free-count" style="font-weight:600;font-size:13px;color:var(--muted)"></span></span><span class="go">Find a room</span></button>
+    <div class="grid">
+      <button class="tile" data-soon="Academic"><svg viewBox="0 0 24 24"><path d="M3 8l9-4 9 4-9 4-9-4z"/><path d="M7 10.5V16c0 1 2.2 2.5 5 2.5s5-1.500 5-2.500v-5.500"/></svg>Academic</button>
+      <button class="tile main" data-go="map"><svg viewBox="0 0 24 24"><path d="M9 4L3 6v14l6-2 6 2 6-2V4l-6 2-6-2z"/><path d="M9 4v14M15 6v14"/></svg>Campus Map</button>
+      <button class="tile" data-soon="Canteen"><svg viewBox="0 0 24 24"><path d="M6 3v8a2 2 0 002 2v8M10 3v8M18 3c-2 2-3 5-3 8h3v10"/></svg>Canteen</button>
+      <button class="tile" data-soon="Dormitory"><svg viewBox="0 0 24 24"><path d="M3 18V8M3 14h18v4M21 14v-2a3 3 0 00-3-3h-7v5"/><circle cx="7" cy="11" r="1.500"/></svg>Dormitory</button>
+      <button class="tile" data-soon="Communication"><svg viewBox="0 0 24 24"><path d="M4 5h16v11H9l-5 4V5z"/></svg>Communication</button>
+      <button class="tile" data-soon="Student Life"><svg viewBox="0 0 24 24"><circle cx="9" cy="8" r="3"/><path d="M3 20c0-3.500 2.700-6 6-6s6 2.500 6 6"/><circle cx="17" cy="9" r="2.200"/><path d="M17 14c2.500 0 4 2 4 5"/></svg>Student Life</button>
+    </div>
+    <div class="spacer"></div>
+    <button class="link" data-go="about">About this prototype: what is done, partly done and planned</button>
+  </section>
+
+  <section class="screen" id="s-map" aria-label="Campus Map">
+    <div class="top"><button class="back" data-back aria-label="Back"><svg viewBox="0 0 24 24"><path d="M15 5l-7 7 7 7"/></svg></button><h1>Campus Map</h1></div>
+    <button class="search" data-go="search"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="M20 20l-4-4"/></svg>Search building or classroom</button>
+    <div class="map" role="img" aria-label="Schematic campus map with Building A, Building B and the Main Library">
+      <div class="road" style="left:0;right:0;top:48%;height:12px"></div>
+      <div class="road" style="top:0;bottom:0;left:46%;width:12px"></div>
+      <button class="bld" data-pick="A" style="left:12%;top:8%;width:30%;height:32%">Building A</button>
+      <button class="bld" data-pick="B" style="right:8%;top:10%;width:30%;height:26%">Building B</button>
+      <button class="bld" data-pick="L" style="left:10%;bottom:8%;width:34%;height:28%">Main Library</button>
+      <div class="me" style="left:50%;top:52%"></div>
+      <div class="melabel" style="left:58%;top:57%">You are here</div>
+    </div>
+    <button class="btn ghost" data-back>Back</button>
+  </section>
+
+  <section class="screen" id="s-search" aria-label="Search">
+    <div class="top"><button class="back" data-back aria-label="Back"><svg viewBox="0 0 24 24"><path d="M15 5l-7 7 7 7"/></svg></button><h1>Search</h1></div>
+    <input class="search" id="q" type="search" placeholder="Search building or classroom" autocomplete="off" aria-label="Search building or classroom">
+    <div class="list" id="results"></div>
+    <div class="spacer"></div>
+    <button class="btn ghost" data-back>Back</button>
+  </section>
+
+  <section class="screen" id="s-building" aria-label="Selected building">
+    <div class="top"><button class="back" data-back aria-label="Back"><svg viewBox="0 0 24 24"><path d="M15 5l-7 7 7 7"/></svg></button><h1 id="b-name">Building A</h1></div>
+    <div class="pin"><svg viewBox="0 0 24 24"><path d="M12 21s7-6.200 7-11.500A7 7 0 005 9.500C5 14.800 12 21 12 21z"/><circle cx="12" cy="9.500" r="2.500"/></svg><span id="b-type">Academic Building</span></div>
+    <div class="facts">
+      <div class="fact"><b id="b-dist">250 m</b><span>Distance</span></div>
+      <div class="fact"><b id="b-time">3 min</b><span>Estimated walking time</span></div>
+    </div>
+    <div class="spacer"></div>
+    <button class="btn" data-go="route">Show Route</button>
+    <button class="btn ghost" data-back>Back</button>
+  </section>
+
+  <section class="screen" id="s-route" aria-label="Route">
+    <div class="top"><button class="back" data-back aria-label="Back"><svg viewBox="0 0 24 24"><path d="M15 5l-7 7 7 7"/></svg></button><h1 id="r-title">Route to Building A</h1></div>
+    <div class="route">
+      <div class="node">START</div>
+      <div class="leg"><span id="r-dist">250 m</span></div>
+      <div class="node end" id="r-end">Building A</div>
+    </div>
+    <div class="msg">Walking time: <b id="r-time">3 minutes</b></div>
+    <button class="btn" id="toMap">Back to Map</button>
+  </section>
+
+
+  <section class="screen" id="s-rooms" aria-label="Free rooms now">
+    <div class="top"><button class="back" data-back aria-label="Back"><svg viewBox="0 0 24 24"><path d="M15 5l-7 7 7 7"/></svg></button><h1>Free rooms now</h1></div>
+    <p class="note" style="margin:0">Occupancy sensors count people in each room. Free = under 10% of the seats are used. <b>Sensor readings here are simulated for the prototype.</b></p>
+    <div class="scroll" id="rooms-list"></div>
+    <button class="btn ghost" data-back>Back</button>
+  </section>
+
+  <section class="screen" id="s-about" aria-label="About this prototype">
+    <div class="top"><button class="back" data-back aria-label="Back"><svg viewBox="0 0 24 24"><path d="M15 5l-7 7 7 7"/></svg></button><h1>About this prototype</h1></div>
+    <div class="scroll">
+      <div class="fn"><span class="st done">DONE</span><span>Campus map, search, building details and route (sample data in this page)</span></div>
+      <div class="fn"><span class="st done">DONE</span><span>Next class card on Home</span></div>
+      <div class="fn"><span class="st part">PARTLY</span><span>Free rooms now: shown with simulated sensor readings; no real sensors are installed</span></div>
+      <div class="fn"><span class="st part">PARTLY</span><span>Academic, Canteen, Dormitory, Communication, Student Life: example screens only</span></div>
+      <div class="fn"><span class="st part">PARTLY</span><span>Data layer: a PostgreSQL database with sample data was built (Assignment 3 and this stage). This page does not read it yet; its data is inside the page</span></div>
+      <div class="fn"><span class="st plan">PLANNED</span><span>University single sign-on, push notifications, real GPS route, REST API to the database</span></div>
+      <p class="note" style="margin:4px 0 0">No personal data is used. All names, rooms and numbers are sample data.</p>
+    </div>
+    <button class="btn ghost" data-back>Back</button>
+  </section>
+
+  <section class="screen" id="s-module" aria-label="Module">
+    <div class="top"><button class="back" data-back aria-label="Back"><svg viewBox="0 0 24 24"><path d="M15 5l-7 7 7 7"/></svg></button><h1 id="m-title">Module</h1></div>
+    <div class="list" id="m-list"></div>
+    <div class="spacer"></div>
+    <div class="msg">This module is shown as an example only. The full flow in this prototype is <b>Campus Map</b>.</div>
+    <button class="btn" data-go="map">Open Campus Map</button>
+    <button class="btn ghost" data-back>Back</button>
+  </section>
+
+  <div class="toast" id="toast" role="status"></div>
+</main>
+
+<div class="flow" id="flow" aria-hidden="true">
+  <span data-f="home">Home</span><span data-f="rooms">Free rooms</span><span data-f="building">Room</span><span data-f="route">Route</span>
+</div>
+
+<script>
+const PLACES={
+  A:{name:'Building A',type:'Academic Building',dist:'250 m',time:3},
+  B:{name:'Building B',type:'Lecture Building',dist:'400 m',time:5},
+  L:{name:'Main Library',type:'Library',dist:'600 m',time:8},
+  C:{name:'Building C',type:'Lecture Building',dist:'320 m',time:4}
+};
+// Simulated sensor readings (people counted now) - same sample numbers as the database
+const ROOMS=[
+ {b:'B',n:'105',cap:80,now:0},{b:'A',n:'204',cap:40,now:3},{b:'A',n:'310',cap:30,now:0},{b:'C',n:'102',cap:50,now:0},
+ {b:'B',n:'301',cap:25,now:5},{b:'C',n:'205',cap:40,now:18},{b:'B',n:'212',cap:35,now:28},{b:'A',n:'101',cap:60,now:52}
+];
+let currentRoom=null;
+function status(r){const p=r.now/r.cap;return p<0.10?'free':p<0.60?'part':'busy'}
+const LBL={free:'Free',part:'Few seats',busy:'Busy'};
+let stack=['home'], current=null;
+const $=id=>document.getElementById(id);
+function show(name,push=true){
+  document.querySelectorAll('.screen').forEach(s=>s.classList.toggle('on',s.id==='s-'+name));
+  document.querySelectorAll('#flow span').forEach(s=>s.classList.toggle('on',s.dataset.f===name));
+  if(push&&stack[stack.length-1]!==name)stack.push(name);
+  if(name==='search'){renderResults($('q').value)}
+  if(name==='rooms'){renderRooms()}
+  try{history.replaceState(null,'','#'+name)}catch(e){}
+}
+function back(){ if(stack.length>1){stack.pop()} show(stack[stack.length-1],false); }
+function pick(k,room){
+  current=PLACES[k]; currentRoom=room||null;
+  $('b-name').textContent=room?('Room '+room.n):current.name; $('b-type').textContent=room?(current.name+' · '+LBL[status(room)]+' now ('+room.now+' of '+room.cap+' seats used)'):current.type;
+  $('b-dist').textContent=current.dist; $('b-time').textContent=current.time+' min';
+  $('r-title').textContent='Route to '+(room?('Room '+room.n):current.name); $('r-end').textContent=room?('Room '+room.n+' · '+current.name):current.name;
+  $('r-dist').textContent=current.dist; $('r-time').textContent=current.time+' minutes';
+  show('building');
+}
+function renderResults(q){
+  q=(q||'').trim().toLowerCase();
+  const box=$('results'); box.innerHTML='';
+  const hits=Object.keys(PLACES).filter(k=>PLACES[k].name.toLowerCase().includes(q));
+  if(!hits.length){
+    const m=document.createElement('div'); m.className='msg';
+    m.textContent='No place found for "'+q+'". Try Building A, Building B or Main Library.'; box.appendChild(m); return;
+  }
+  hits.forEach(k=>{
+    const b=document.createElement('button'); b.className='item';
+    b.innerHTML='<span></span><small></small>'; b.children[0].textContent=PLACES[k].name; b.children[1].textContent=PLACES[k].type+' · '+PLACES[k].dist;
+    b.onclick=()=>pick(k); box.appendChild(b);
+  });
+}
+const MODS={
+ 'Academic':[['Today\'s Classes','09:00 Calculus · B201'],['','11:00 Programming · C305'],['Grades','GPA, course grades'],['Deadlines','Assignments and quizzes']],
+ 'Canteen':[['Today\'s Menu','Soup 700 ₸ · Chicken 1200 ₸'],['','Rice 600 ₸ · Drink 300 ₸'],['Opening hours','08:00 – 20:00']],
+ 'Dormitory':[['Room 304','Dormitory 2'],['Announcements','Water maintenance — October 10'],['Maintenance request','Contact administration']],
+ 'Communication':[['Important Announcement','Midterm exams start next week'],['IT Department','Programming deadline: October 15'],['Student Affairs','Student event on Friday']],
+ 'Student Life':[['Gaming Club','Friday — 18:00'],['Football Tournament','Saturday — 15:00'],['Hackathon','October 20']]
+};
+function openModule(n){
+  $('m-title').textContent=n; const box=$('m-list'); box.innerHTML='';
+  MODS[n].forEach(r=>{const d=document.createElement('div');d.className='item';d.innerHTML='<span></span><small></small>';
+    d.children[0].textContent=r[0]||r[1]; d.children[1].textContent=r[0]?r[1]:''; if(!r[0])d.children[1].remove(); box.appendChild(d);});
+  show('module');
+}
+function renderRooms(){
+  const box=$('rooms-list'); box.innerHTML='';
+  const rank={free:0,part:1,busy:2};
+  ROOMS.slice().sort((a,b)=>rank[status(a)]-rank[status(b)]||a.n.localeCompare(b.n)).forEach(r=>{
+    const st=status(r); const b=document.createElement('button'); b.className='room';
+    b.innerHTML='<span class="t"><span></span><small></small></span><span class="badge '+st+'"></span>';
+    b.querySelector('.t span').textContent='Room '+r.n+' · '+PLACES[r.b].name;
+    b.querySelector('small').textContent=r.now+' of '+r.cap+' seats in use';
+    b.querySelector('.badge').textContent=LBL[st];
+    b.onclick=()=>{ if(st==='busy'){toast('Room '+r.n+' is busy now. Choose a free room.');return} pick(r.b,r) };
+    box.appendChild(b);
+  });
+}
+const fc=ROOMS.filter(r=>status(r)==='free').length; $('free-count').textContent=fc+' rooms free now';
+let tt;
+function toast(t){const e=$('toast');e.textContent=t;e.classList.add('on');clearTimeout(tt);tt=setTimeout(()=>e.classList.remove('on'),2200)}
+document.addEventListener('click',e=>{
+  const g=e.target.closest('[data-go]'); if(g){show(g.dataset.go);return}
+  const b=e.target.closest('[data-back]'); if(b){back();return}
+  const p=e.target.closest('[data-pick]'); if(p){pick(p.dataset.pick);return}
+  const s=e.target.closest('[data-soon]'); if(s){openModule(s.dataset.soon);}
+});
+$('toMap').onclick=()=>{stack=['home','map'];show('map',false)};
+$('q').addEventListener('input',e=>renderResults(e.target.value));
+const h=location.hash.slice(1);
+if(['rooms','about'].includes(h)){stack=['home',h];show(h,false)}
+else if(['home','map','search','building','route'].includes(h)){
+  if(h==='building'||h==='route')pick('A');
+  stack=['home','map','search','building','route'].slice(0,['home','map','search','building','route'].indexOf(h)+1);
+  show(h,false);
+}else show('home',false);
+</script>
+
+</body></html>
